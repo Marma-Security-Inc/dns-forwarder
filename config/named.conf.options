@@ -9,7 +9,6 @@ options {
     forwarders {
         103.247.36.36;
         103.247.37.37;
-        8.8.8.8;
     };
 
     forward only;

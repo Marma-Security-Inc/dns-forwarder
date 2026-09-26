@@ -60,7 +60,7 @@ done
 for cidr in "${clients[@]}"; do
     for proto in udp tcp; do ufw allow from "$cidr" to any port 53 proto "$proto"; done
 done
-for server in 103.247.36.36 103.247.37.37 8.8.8.8; do
+for server in 103.247.36.36 103.247.37.37; do
     for proto in udp tcp; do ufw allow out to "$server" port 53 proto "$proto"; done
 done
 # No reset/deletion: existing application and SSH allowances survive reruns.

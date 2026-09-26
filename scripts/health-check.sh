@@ -21,7 +21,7 @@ for protocol in u t; do
 done
 private_ip=${PRIVATE_IP:-$(ip -4 route get 8.8.8.8 | awk '{for(i=1;i<=NF;i++)if($i=="src"){print $(i+1);exit}}')}
 if [[ -z $private_ip ]]; then echo 'FAIL: no private IP'; fail=1; fi
-for server in 127.0.0.1 ${private_ip:+"$private_ip"} 103.247.36.36 103.247.37.37 8.8.8.8; do
+for server in 127.0.0.1 ${private_ip:+"$private_ip"} 103.247.36.36 103.247.37.37; do
     for mode in +notcp +tcp; do
         if answer=$(dig @"$server" "${TEST_DOMAIN:-darkside.cloud}" A "$mode" +time=4 +tries=1 +noall +comments +answer) &&
            grep -q 'status: NOERROR' <<< "$answer" &&
@@ -61,7 +61,7 @@ def has_rule(cidr,proto,out=False):
     return False
 for cidr in cidrs:
     for proto in ['udp','tcp']: assert has_rule(cidr,proto), f'Missing inbound {proto}/53 rule for {cidr}'
-for ip in ['103.247.36.36','103.247.37.37','8.8.8.8']:
+for ip in ['103.247.36.36','103.247.37.37']:
     for proto in ['udp','tcp']: assert has_rule(ip,proto,True), f'Missing outbound {proto}/53 rule for {ip}'
 print('Expected DNS firewall rules present; rule precedence and AWS path require external testing.')
 PYCHECK
