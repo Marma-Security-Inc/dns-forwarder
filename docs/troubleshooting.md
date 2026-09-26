@@ -31,7 +31,7 @@ On this machine, localhost/private-IP queries worked while the Mac's public-IP q
 
 Google forwarders were then requested. They responded on UDP/TCP but returned `198.49.23.145`. After adding Mac public address `202.141.32.157/32` to UFW, the user supplied successful UDP and TCP results through `13.56.157.159`, both NOERROR with recursion available. There was no evidence requiring an AWS change for that client. An earlier capture with no confirmed query was not treated as proof of an AWS block.
 
-The user subsequently explicitly opened AWS and UFW DNS to all IPv4 clients. Finally the upstream list became `103.247.36.36`, `103.247.37.37`, `8.8.8.8`. This repository records that current working BIND configuration, but intentionally uses restricted deployment client CIDRs. The latest baseline and health check show all three upstreams respond; BIND's current cached answer can be Google's address. Do not force a specific A record or assume the upstream list is strict ordered failover.
+The user subsequently explicitly opened AWS and UFW DNS to all IPv4 clients. Finally the upstream list became `103.247.36.36`, `103.247.37.37`, `8.8.8.8`. This repository records that current working BIND configuration, originally with restricted deployment client CIDRs. On 2026-09-26, the repository defaults were explicitly changed to public IPv4 DNS with optional manual ADMIN_CIDR; the recorded baseline remains historical. The latest baseline and health check show all three upstreams respond; BIND's current cached answer can be Google's address. Do not force a specific A record or assume the upstream list is strict ordered failover.
 
 ## Common failures
 
@@ -40,3 +40,9 @@ The user subsequently explicitly opened AWS and UFW DNS to all IPv4 clients. Fin
 * UFW rule check failure: verify settings JSON/client CIDRs and `ufw show added`. Existing broad rules are not removed on bootstrap reruns.
 * Host checks pass but external tests fail: investigate the full network path above; health-check does not claim public reachability.
 * Terraform completes but setup fails: inspect cloud-init logs. User-data changes recreate the instance; applying Terraform is not a health check.
+
+## Optional admin CIDR and SSH discovery
+
+Manual `sudo ./scripts/bootstrap.sh` uses public DNS defaults only when no saved DNS CIDRs exist. Saved admin and DNS restrictions survive reruns. No admin CIDR means detected SSH ports are allowed through UFW from anywhere: restrict sources in the provider firewall. Terraform still requires restricted `admin_cidr`.
+
+A failure to identify SSH listeners stops bootstrap before firewall rule changes. Check `sudo sshd -t`, `sudo sshd -T`, `sudo ss -lntp`, and `systemctl status ssh.socket` or `sshd.socket`. Ensure OpenSSH is active or its socket listener is active; do not bypass detection with a guessed port. Invalid `SSH_CONNECTION` metadata also fails safely. PEM authentication remains unchanged.

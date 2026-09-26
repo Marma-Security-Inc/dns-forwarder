@@ -4,14 +4,16 @@ Terraform + cloud-init reproduce the working server's BIND behavior. The byte-fo
 
 Clients reach an EC2 IPv4 address over UDP/TCP 53; the Security Group and UFW control access; BIND forwards to `103.247.36.36`, `103.247.37.37`, and `8.8.8.8`, in that configured order. This is not guaranteed primary/secondary ordering: upstreams return different answers for `darkside.cloud`. Google returns `198.49.23.145`; the other two return `45.54.28.15`. Health checks intentionally accept either successful A response.
 
-The live host explicitly permits public recursion. **New deployments require restricted DNS client CIDRs**, even though BIND retains `allow-query { any; };` and `allow-recursion { any; };`. There are no public DNS defaults. Terraform rejects `/0`. A public resolver can be abused for reflection/amplification and incur bandwidth charges. Keep SSH restricted too.
+**New deployments default to public IPv4 DNS recursion** (`0.0.0.0/0` on UDP/TCP 53), as explicitly authorized. BIND retains `allow-query { any; };` and `allow-recursion { any; };`. A public resolver can be abused for reflection/amplification and incur bandwidth charges. Override DNS client CIDRs to restrict access when desired.
+
+Manual bootstrap no longer requires `ADMIN_CIDR`. Without an explicit or persisted admin CIDR, it allows detected SSH ports through UFW from anywhere; **restrict SSH sources in your AWS Security Group or other provider firewall**. A PEM key authenticates SSH users; it does not replace firewall access controls. SSH authentication and keys are never changed. Terraform still requires a restricted `admin_cidr` for its Security Group and passes it to cloud-init.
 
 ## Prerequisites
 
 * Terraform >=1.5,<2 and AWS credentials with permission to create EC2, SG rules, tags and optionally an Elastic IP.
 * Existing VPC and public subnet with Internet Gateway route, suitable NACL, and an EC2 key pair in the chosen region.
 * A pinned Canonical Ubuntu 26.04 ARM64 AMI for `t4g.small`, or an Ubuntu AMI and instance type with matching architecture. Obtain the current regional AMI from Canonical/AWS; verify its publisher. No AMI ID is invented here.
-* Your public IPv4 `/32` for SSH and DNS clients. The sample documentation address must be replaced.
+* Terraform requires your trusted SSH source IPv4 CIDR. Replace the sample admin address. DNS defaults to all IPv4 clients; restricted DNS CIDRs are optional.
 * Ubuntu/Debian manual hosts need Bash, Python 3, systemd, OpenSSH, sudo/root, and apt repositories. Ubuntu cloud images include these.
 
 Package versions follow the selected image's repositories; exact BIND 9.20.24 is recorded, not pinned to a package that may disappear. Pin an AMI/repository snapshot separately if binary-identical reproduction is required.
@@ -47,19 +49,33 @@ Changing embedded files or client settings changes user-data and **replaces the 
 
 ## Manual bootstrap
 
-On a fresh instance, clone this repository, then replace the documentation addresses:
+On a fresh Ubuntu VPS, with provider firewall rules allowing DNS UDP/TCP 53 from `0.0.0.0/0` and SSH only from your trusted admin IP:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y git
+git clone https://github.com/Marma-Security-Inc/dns-forwarder.git
+cd dns-forwarder
+sudo ./scripts/bootstrap.sh
+sudo ./scripts/health-check.sh
+sudo env TEST_DOMAIN=example.com ./scripts/health-check.sh
+```
+
+A private GitHub repository requires authentication when cloning. Test externally with `dig @VPS_PUBLIC_IP darkside.cloud` and `dig @VPS_PUBLIC_IP darkside.cloud +tcp`.
+
+For optional host-level restrictions, replace these documentation addresses:
 
 ```bash
 sudo env ADMIN_CIDR=203.0.113.10/32 \
   DNS_CLIENT_CIDRS='203.0.113.10/32 172.31.0.0/16' \
   ./scripts/bootstrap.sh
-sudo ./scripts/health-check.sh
-sudo env TEST_DOMAIN=example.com ./scripts/health-check.sh
 ```
+
+Bootstrap validates SSH configuration, discovers active sshd listeners (including systemd SSH socket activation), accounts for configured ports and `SSH_CONNECTION` when available, and adds allowances before enabling/reloading UFW. If active SSH listeners cannot be identified reliably, it fails before firewall changes. It does not blindly assume port 22. Existing SSH rules and authentication settings are preserved.
 
 Settings persist in `/etc/dns-forwarder/settings.json`. Rerunning `sudo ./scripts/bootstrap.sh` uses them. Rules are additive and duplicates are skipped. Existing allowances (including broad ones) are preserved: shrinking the configured CIDR list does **not** revoke old UFW rules. Inspect `ufw status numbered` and remove obsolete rules intentionally. Cloud-init replacement gives new deployments a clean rule set. Bootstrap owns the options file but preserves other BIND files and makes backups; inspect custom host settings before adoption. Incoming default becomes deny; outgoing becomes allow. Other application ports must be explicitly permitted before enabling UFW on a multipurpose host.
 
-Explicit manual public recursion requires `ALLOW_PUBLIC_DNS=1 DNS_CLIENT_CIDRS=0.0.0.0/0`; this is not the recommended deployment path and must also be authorized in AWS. Existing live firewall rules are not modified by the health check.
+No `ALLOW_PUBLIC_DNS` flag is required. Setting precedence is explicit nonempty environment variables, then saved settings, then defaults (public DNS, no admin CIDR). Saved restricted CIDRs are not replaced by the new defaults. To deliberately change saved DNS settings, pass `DNS_CLIENT_CIDRS=0.0.0.0/0`; to remove a saved admin CIDR, edit settings.json explicitly. Neither action removes existing UFW rules. Health checks use the same settings/defaults and never modify the firewall.
 
 ## Configuration and forwarder updates
 
@@ -74,10 +90,10 @@ sudo ./scripts/health-check.sh
 sudo ./scripts/diagnose.sh
 ```
 
-The preexisting live server lacks the new settings JSON. Check it without writing anything:
+A host without settings JSON is checked against the public DNS default. Check it without writing anything:
 
 ```bash
-sudo env DNS_CLIENT_CIDRS=0.0.0.0/0 ./scripts/health-check.sh
+sudo ./scripts/health-check.sh
 ```
 
 Backups are retained under `/var/backups/dns-forwarder.*`. `preinstall-bind` records existing configuration before apt; `installed-bind` is the post-install, pre-replacement BIND tree (also available on fresh hosts). Restore the options file from a chosen backup:

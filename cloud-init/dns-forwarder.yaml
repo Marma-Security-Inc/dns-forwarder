@@ -22,6 +22,11 @@ write_files:
     permissions: '0755'
     encoding: b64
     content: ${diagnose}
+  - path: /opt/dns-forwarder/scripts/forwarder_config.py
+    owner: root:root
+    permissions: '0644'
+    encoding: b64
+    content: ${helper}
   - path: /etc/dns-forwarder/settings.json
     owner: root:root
     permissions: '0600'

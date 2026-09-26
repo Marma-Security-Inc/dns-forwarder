@@ -28,11 +28,12 @@ variable "admin_cidr" {
   }
 }
 variable "dns_client_cidrs" {
-  description = "Explicit trusted IPv4 client networks; no public resolver by default."
+  description = "IPv4 DNS clients; public recursion is the default. Override to restrict access."
   type        = set(string)
+  default     = ["0.0.0.0/0"]
   validation {
-    condition     = length(var.dns_client_cidrs) > 0 && alltrue([for c in var.dns_client_cidrs : can(cidrnetmask(c)) && !endswith(c, "/0")])
-    error_message = "Supply nonempty restricted IPv4 client CIDRs; /0 is not supported by this safe deployment."
+    condition     = length(var.dns_client_cidrs) > 0 && alltrue([for c in var.dns_client_cidrs : can(cidrnetmask(c))])
+    error_message = "Supply a nonempty set of IPv4 client CIDRs."
   }
 }
 variable "associate_elastic_ip" {

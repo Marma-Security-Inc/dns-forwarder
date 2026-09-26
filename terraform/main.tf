@@ -10,6 +10,7 @@ data "aws_subnet" "selected" {
 locals {
   user_data = templatefile("${path.module}/../cloud-init/dns-forwarder.yaml", {
     bind_config = filebase64("${path.module}/../config/named.conf.options")
+    helper      = filebase64("${path.module}/../scripts/forwarder_config.py")
     bootstrap   = filebase64("${path.module}/../scripts/bootstrap.sh")
     health      = filebase64("${path.module}/../scripts/health-check.sh")
     diagnose    = filebase64("${path.module}/../scripts/diagnose.sh")

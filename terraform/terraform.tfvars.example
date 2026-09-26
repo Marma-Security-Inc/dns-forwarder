@@ -5,6 +5,6 @@ vpc_id               = "vpc-REPLACE"
 subnet_id            = "subnet-REPLACE"
 key_name             = "REPLACE_WITH_EXISTING_EC2_KEY_PAIR"
 admin_cidr           = "203.0.113.10/32" # Documentation address: replace with your public IP.
-dns_client_cidrs     = ["203.0.113.10/32"]
+dns_client_cidrs     = ["0.0.0.0/0"] # Public recursive DNS; override to restrict.
 associate_elastic_ip = false
 tags                 = { Environment = "dev" }

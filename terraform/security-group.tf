@@ -1,6 +1,6 @@
 resource "aws_security_group" "dns" {
   name_prefix = "dns-forwarder-"
-  description = "Restricted SSH and recursive DNS clients"
+  description = "Restricted SSH and configurable recursive DNS clients"
   vpc_id      = var.vpc_id
 }
 resource "aws_vpc_security_group_ingress_rule" "ssh" {

@@ -24,21 +24,10 @@ trap 'failure "$LINENO"' ERR
 settings=${DNS_SETTINGS_FILE:-/etc/dns-forwarder/settings.json}
 staged=$(mktemp /run/dns-forwarder-settings.XXXXXXXX)
 trap 'rm -f "$staged"' EXIT
-python3 - "$settings" "$staged" <<'PYSET'
-import sys,os,json,pathlib,ipaddress
-p=pathlib.Path(sys.argv[1]); s=json.loads(p.read_text()) if p.exists() else {}
-for key,env in [('admin_cidr','ADMIN_CIDR'),('dns_client_cidrs','DNS_CLIENT_CIDRS')]:
-    if os.environ.get(env): s[key]=os.environ[env].split() if key=='dns_client_cidrs' else os.environ[env]
-assert s.get('admin_cidr') and s.get('dns_client_cidrs'), 'Set ADMIN_CIDR and DNS_CLIENT_CIDRS, or supply settings.json'
-for cidr in [s['admin_cidr']]+s['dns_client_cidrs']:
-    n=ipaddress.ip_network(cidr,strict=True)
-    assert n.version==4, 'IPv4 CIDRs required'
-    assert n.prefixlen>0 or (cidr in s['dns_client_cidrs'] and os.environ.get('ALLOW_PUBLIC_DNS')=='1'), 'Public DNS requires explicit ALLOW_PUBLIC_DNS=1; SSH must remain restricted'
-assert ipaddress.ip_network(s['admin_cidr']).prefixlen>0, 'Restrict admin_cidr'
-pathlib.Path(sys.argv[2]).write_text(json.dumps(s,indent=2)+'\n')
-PYSET
-admin=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["admin_cidr"])' "$staged")
-mapfile -t clients < <(python3 -c 'import json,sys; print("\n".join(json.load(open(sys.argv[1]))["dns_client_cidrs"]))' "$staged")
+python3 "$repo/scripts/forwarder_config.py" settings "$settings" "$staged"
+admin=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("admin_cidr") or "")' "$staged")
+clients=()
+while IFS= read -r client; do clients+=("$client"); done < <(python3 -c 'import json,sys; print("\n".join(json.load(open(sys.argv[1]))["dns_client_cidrs"]))' "$staged")
 backup=$(mktemp -d /var/backups/dns-forwarder.XXXXXXXX)
 [[ ! -d /etc/bind ]] || cp -a /etc/bind "$backup/preinstall-bind"
 [[ ! -d /etc/ufw ]] || cp -a /etc/ufw "$backup/ufw"
@@ -51,14 +40,23 @@ named-checkconf
 ufw status verbose
 ufw status numbered
 sshd -t
-mapfile -t ports < <({ sshd -T | awk '$1=="port"{print $2}'; ss -H -lntp | awk '/"sshd"/{n=split($4,a,":"); print a[n]}'; } | sort -nu)
-[[ ${#ports[@]} -gt 0 ]] || { echo 'FAIL: cannot determine SSH ports'; exit 1; }
-# Preserve the active SSH session even if it uses a port different from sshd_config.
-if [[ -n ${SSH_CONNECTION:-} ]]; then
-    read -r peer _ _ session_port <<< "$SSH_CONNECTION"
+# A direct assignment propagates discovery failures before any firewall mutation.
+ssh_info=$(python3 "$repo/scripts/forwarder_config.py" ssh)
+ports=()
+while IFS= read -r port; do ports+=("$port"); done < <(python3 -c 'import json,sys; print("\n".join(map(str,json.loads(sys.argv[1])["ports"])))' "$ssh_info")
+peer=$(python3 -c 'import json,sys; print(json.loads(sys.argv[1]).get("peer", ""))' "$ssh_info")
+if [[ -n $peer ]]; then
+    session_port=$(python3 -c 'import json,sys; print(json.loads(sys.argv[1])["session_port"])' "$ssh_info")
     ufw allow from "$peer" to any port "$session_port" proto tcp
 fi
-for port in "${ports[@]}"; do ufw allow from "$admin" to any port "$port" proto tcp; done
+for port in "${ports[@]}"; do
+    if [[ -n $admin ]]; then
+        ufw allow from "$admin" to any port "$port" proto tcp
+    else
+        # SSH source restrictions are delegated to the provider firewall.
+        ufw allow "$port/tcp"
+    fi
+done
 for cidr in "${clients[@]}"; do
     for proto in udp tcp; do ufw allow from "$cidr" to any port 53 proto "$proto"; done
 done

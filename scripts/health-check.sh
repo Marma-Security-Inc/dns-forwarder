@@ -2,6 +2,7 @@
 set -uo pipefail
 export LC_ALL=C
 [[ $EUID == 0 ]] || { echo 'FAIL: run with sudo (BIND keys and UFW require root)'; exit 1; }
+repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 fail=0
 check() { if "$@"; then echo "PASS: $*"; else echo "FAIL: $*" >&2; fail=1; fi; }
 service=''
@@ -31,14 +32,14 @@ for server in 127.0.0.1 ${private_ip:+"$private_ip"} 103.247.36.36 103.247.37.37
 done
 check ufw status verbose
 # Compare expected rules, not just whether ufw is installed or has a DNS listener.
-check python3 - <<'PYCHECK'
-import os,json,subprocess,shlex,ipaddress,pathlib
+check python3 - "$repo/scripts" <<'PYCHECK'
+import os,subprocess,shlex,ipaddress,sys
+sys.path.insert(0, sys.argv[1])
+from forwarder_config import settings
 status=subprocess.check_output(['ufw','status'],text=True)
 assert 'Status: active' in status, 'UFW is inactive'
-p=pathlib.Path('/etc/dns-forwarder/settings.json')
-settings=json.loads(p.read_text()) if p.exists() else {}
-cidrs=os.environ.get('DNS_CLIENT_CIDRS','').split() or settings.get('dns_client_cidrs',[])
-assert cidrs, 'Set DNS_CLIENT_CIDRS or install /etc/dns-forwarder/settings.json'
+config = settings(os.environ.get('DNS_SETTINGS_FILE', '/etc/dns-forwarder/settings.json'), os.environ)
+cidrs = config['dns_client_cidrs']
 rules=[]
 for line in subprocess.check_output(['ufw','show','added'],text=True).splitlines():
     words=shlex.split(line)
