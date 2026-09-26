@@ -1,0 +1,382 @@
+Thu Sep 24 18:07:57 UTC 2026
+ip-172-31-23-149
+PRETTY_NAME="Ubuntu 26.04 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+VERSION="26.04 LTS (Resolute Raccoon)"
+VERSION_CODENAME=resolute
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=resolute
+LOGO=ubuntu-logo
+BIND 9.20.24-1ubuntu0.3-Ubuntu (Stable Release) <id:>
+options {
+    directory "/var/cache/bind";
+
+    recursion yes;
+
+    allow-query { any; };
+    allow-recursion { any; };
+
+    forwarders {
+        103.247.36.36;
+        103.247.37.37;
+        8.8.8.8;
+    };
+
+    forward only;
+
+    dnssec-validation no;
+};
+● named.service - BIND Domain Name Server
+     Loaded: loaded (/usr/lib/systemd/system/named.service; enabled; preset: enabled)
+     Active: active (running) since Thu 2026-09-24 17:57:45 UTC; 10min ago
+ Invocation: 47800077fc8e4177bc5481e9b7530391
+       Docs: man:named(8)
+   Main PID: 3618 (named)
+     Status: "running"
+      Tasks: 6 (limit: 1929)
+     Memory: 8.3M (peak: 8.8M)
+        CPU: 29ms
+     CGroup: /system.slice/named.service
+             └─3618 /usr/sbin/named -f -u bind
+
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: generating session key for dynamic DNS
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: none:96: 'max-cache-size 90%' - setting to 1651MB (out of 1834MB)
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: configuring command channel from '/etc/bind/rndc.key'
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: command channel listening on 127.0.0.1#953
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: configuring command channel from '/etc/bind/rndc.key'
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: command channel listening on ::1#953
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: all zones loaded
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: FIPS mode is disabled
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: running
+Sep 24 17:57:45 ip-172-31-23-149 systemd[1]: Started named.service - BIND Domain Name Server.
+● named.service - BIND Domain Name Server
+     Loaded: loaded (/usr/lib/systemd/system/named.service; enabled; preset: enabled)
+     Active: active (running) since Thu 2026-09-24 17:57:45 UTC; 10min ago
+ Invocation: 47800077fc8e4177bc5481e9b7530391
+       Docs: man:named(8)
+   Main PID: 3618 (named)
+     Status: "running"
+      Tasks: 6 (limit: 1929)
+     Memory: 8.3M (peak: 8.8M)
+        CPU: 29ms
+     CGroup: /system.slice/named.service
+             └─3618 /usr/sbin/named -f -u bind
+
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: generating session key for dynamic DNS
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: none:96: 'max-cache-size 90%' - setting to 1651MB (out of 1834MB)
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: configuring command channel from '/etc/bind/rndc.key'
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: command channel listening on 127.0.0.1#953
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: configuring command channel from '/etc/bind/rndc.key'
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: command channel listening on ::1#953
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: all zones loaded
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: FIPS mode is disabled
+Sep 24 17:57:45 ip-172-31-23-149 named[3618]: running
+Sep 24 17:57:45 ip-172-31-23-149 systemd[1]: Started named.service - BIND Domain Name Server.
+enabled
+alias
+udp   UNCONN 0      0                       172.31.23.149:53        0.0.0.0:*    users:(("named",pid=3618,fd=35))
+udp   UNCONN 0      0                       172.31.23.149:53        0.0.0.0:*    users:(("named",pid=3618,fd=34))
+udp   UNCONN 0      0                           127.0.0.1:53        0.0.0.0:*    users:(("named",pid=3618,fd=29))
+udp   UNCONN 0      0                           127.0.0.1:53        0.0.0.0:*    users:(("named",pid=3618,fd=28))
+udp   UNCONN 0      0                          127.0.0.54:53        0.0.0.0:*    users:(("systemd-resolve",pid=214,fd=18))
+udp   UNCONN 0      0                       127.0.0.53%lo:53        0.0.0.0:*    users:(("systemd-resolve",pid=214,fd=16))
+udp   UNCONN 0      0                               [::1]:53           [::]:*    users:(("named",pid=3618,fd=38))
+udp   UNCONN 0      0                               [::1]:53           [::]:*    users:(("named",pid=3618,fd=39))
+udp   UNCONN 0      0      [fe80::43:caff:fe83:6b73]%ens5:53           [::]:*    users:(("named",pid=3618,fd=42))
+udp   UNCONN 0      0      [fe80::43:caff:fe83:6b73]%ens5:53           [::]:*    users:(("named",pid=3618,fd=43))
+tcp   LISTEN 0      4096                    127.0.0.53%lo:53        0.0.0.0:*    users:(("systemd-resolve",pid=214,fd=17))
+tcp   LISTEN 0      4096                       127.0.0.54:53        0.0.0.0:*    users:(("systemd-resolve",pid=214,fd=19))
+tcp   LISTEN 0      10                          127.0.0.1:53        0.0.0.0:*    users:(("named",pid=3618,fd=32))
+tcp   LISTEN 0      10                          127.0.0.1:53        0.0.0.0:*    users:(("named",pid=3618,fd=30))
+tcp   LISTEN 0      10                      172.31.23.149:53        0.0.0.0:*    users:(("named",pid=3618,fd=37))
+tcp   LISTEN 0      10                      172.31.23.149:53        0.0.0.0:*    users:(("named",pid=3618,fd=36))
+tcp   LISTEN 0      10                              [::1]:53           [::]:*    users:(("named",pid=3618,fd=40))
+tcp   LISTEN 0      10                              [::1]:53           [::]:*    users:(("named",pid=3618,fd=41))
+tcp   LISTEN 0      10     [fe80::43:caff:fe83:6b73]%ens5:53           [::]:*    users:(("named",pid=3618,fd=44))
+tcp   LISTEN 0      10     [fe80::43:caff:fe83:6b73]%ens5:53           [::]:*    users:(("named",pid=3618,fd=45))
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), disabled (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW IN    Anywhere
+53/udp                     ALLOW IN    10.0.0.0/8
+53/tcp                     ALLOW IN    10.0.0.0/8
+53/udp                     ALLOW IN    172.16.0.0/12
+53/tcp                     ALLOW IN    172.16.0.0/12
+53/udp                     ALLOW IN    192.168.0.0/16
+53/tcp                     ALLOW IN    192.168.0.0/16
+53/udp                     ALLOW IN    202.141.32.157
+53/tcp                     ALLOW IN    202.141.32.157
+53/udp                     ALLOW IN    Anywhere
+53/tcp                     ALLOW IN    Anywhere
+22/tcp (v6)                ALLOW IN    Anywhere (v6)
+
+103.247.36.36 53/udp       ALLOW OUT   Anywhere
+103.247.36.36 53/tcp       ALLOW OUT   Anywhere
+103.247.37.37 53/udp       ALLOW OUT   Anywhere
+103.247.37.37 53/tcp       ALLOW OUT   Anywhere
+8.8.8.8 53/udp             ALLOW OUT   Anywhere
+8.8.8.8 53/tcp             ALLOW OUT   Anywhere
+8.8.4.4 53/udp             ALLOW OUT   Anywhere
+8.8.4.4 53/tcp             ALLOW OUT   Anywhere
+
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] 22/tcp                     ALLOW IN    Anywhere
+[ 2] 53/udp                     ALLOW IN    10.0.0.0/8
+[ 3] 53/tcp                     ALLOW IN    10.0.0.0/8
+[ 4] 53/udp                     ALLOW IN    172.16.0.0/12
+[ 5] 53/tcp                     ALLOW IN    172.16.0.0/12
+[ 6] 53/udp                     ALLOW IN    192.168.0.0/16
+[ 7] 53/tcp                     ALLOW IN    192.168.0.0/16
+[ 8] 103.247.36.36 53/udp       ALLOW OUT   Anywhere                   (out)
+[ 9] 103.247.36.36 53/tcp       ALLOW OUT   Anywhere                   (out)
+[10] 103.247.37.37 53/udp       ALLOW OUT   Anywhere                   (out)
+[11] 103.247.37.37 53/tcp       ALLOW OUT   Anywhere                   (out)
+[12] 8.8.8.8 53/udp             ALLOW OUT   Anywhere                   (out)
+[13] 8.8.8.8 53/tcp             ALLOW OUT   Anywhere                   (out)
+[14] 8.8.4.4 53/udp             ALLOW OUT   Anywhere                   (out)
+[15] 8.8.4.4 53/tcp             ALLOW OUT   Anywhere                   (out)
+[16] 53/udp                     ALLOW IN    202.141.32.157
+[17] 53/tcp                     ALLOW IN    202.141.32.157
+[18] 53/udp                     ALLOW IN    Anywhere
+[19] 53/tcp                     ALLOW IN    Anywhere
+[20] 22/tcp (v6)                ALLOW IN    Anywhere (v6)
+
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute
+       valid_lft forever preferred_lft forever
+2: ens5: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9001 qdisc mq state UP group default qlen 1000
+    link/ether 02:43:ca:83:6b:73 brd ff:ff:ff:ff:ff:ff
+    altname enp0s5
+    altname enx0243ca836b73
+    inet 172.31.23.149/20 metric 100 brd 172.31.31.255 scope global dynamic ens5
+       valid_lft 2111sec preferred_lft 2111sec
+    inet6 fe80::43:caff:fe83:6b73/64 scope link proto kernel_ll
+       valid_lft forever preferred_lft forever
+default via 172.31.16.1 dev ens5 proto dhcp src 172.31.23.149 metric 100
+172.31.0.2 via 172.31.16.1 dev ens5 proto dhcp src 172.31.23.149 metric 100
+172.31.16.0/20 dev ens5 proto kernel scope link src 172.31.23.149 metric 100
+172.31.16.1 dev ens5 proto dhcp scope link src 172.31.23.149 metric 100
+172.31.23.149
+
+; <<>> DiG 9.20.24-1ubuntu0.3-Ubuntu <<>> @127.0.0.1 darkside.cloud +notcp +time=4 +tries=1
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 24196
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: 623e9e27a63d1193010000006ab566fda822b0cf83fb84e0 (good)
+;; QUESTION SECTION:
+;darkside.cloud.			IN	A
+
+;; ANSWER SECTION:
+darkside.cloud.		14400	IN	A	198.49.23.145
+
+;; Query time: 34 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1) (UDP)
+;; WHEN: Thu Sep 24 18:07:57 UTC 2026
+;; MSG SIZE  rcvd: 87
+
+
+; <<>> DiG 9.20.24-1ubuntu0.3-Ubuntu <<>> @127.0.0.1 darkside.cloud +tcp +time=4 +tries=1
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 3796
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: 9e0b417a476a28a6010000006ab566fde5a1e31790c96c58 (good)
+;; QUESTION SECTION:
+;darkside.cloud.			IN	A
+
+;; ANSWER SECTION:
+darkside.cloud.		14400	IN	A	198.49.23.145
+
+;; Query time: 0 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1) (TCP)
+;; WHEN: Thu Sep 24 18:07:57 UTC 2026
+;; MSG SIZE  rcvd: 87
+
+
+; <<>> DiG 9.20.24-1ubuntu0.3-Ubuntu <<>> @172.31.23.149 darkside.cloud +notcp +time=4 +tries=1
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 7240
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: a8b14fca2b210756010000006ab566fd1a413351c25bd874 (good)
+;; QUESTION SECTION:
+;darkside.cloud.			IN	A
+
+;; ANSWER SECTION:
+darkside.cloud.		14400	IN	A	198.49.23.145
+
+;; Query time: 0 msec
+;; SERVER: 172.31.23.149#53(172.31.23.149) (UDP)
+;; WHEN: Thu Sep 24 18:07:57 UTC 2026
+;; MSG SIZE  rcvd: 87
+
+
+; <<>> DiG 9.20.24-1ubuntu0.3-Ubuntu <<>> @172.31.23.149 darkside.cloud +tcp +time=4 +tries=1
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 20269
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: da81153ba3e8c01d010000006ab566fdf6be3a6b10e753ed (good)
+;; QUESTION SECTION:
+;darkside.cloud.			IN	A
+
+;; ANSWER SECTION:
+darkside.cloud.		14400	IN	A	198.49.23.145
+
+;; Query time: 0 msec
+;; SERVER: 172.31.23.149#53(172.31.23.149) (TCP)
+;; WHEN: Thu Sep 24 18:07:57 UTC 2026
+;; MSG SIZE  rcvd: 87
+
+
+; <<>> DiG 9.20.24-1ubuntu0.3-Ubuntu <<>> @103.247.36.36 darkside.cloud +notcp +time=4 +tries=1
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 29361
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;darkside.cloud.			IN	A
+
+;; ANSWER SECTION:
+darkside.cloud.		30	IN	A	45.54.28.15
+
+;; Query time: 1 msec
+;; SERVER: 103.247.36.36#53(103.247.36.36) (UDP)
+;; WHEN: Thu Sep 24 18:07:57 UTC 2026
+;; MSG SIZE  rcvd: 48
+
+
+; <<>> DiG 9.20.24-1ubuntu0.3-Ubuntu <<>> @103.247.36.36 darkside.cloud +tcp +time=4 +tries=1
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 12482
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;darkside.cloud.			IN	A
+
+;; ANSWER SECTION:
+darkside.cloud.		30	IN	A	45.54.28.15
+
+;; Query time: 2 msec
+;; SERVER: 103.247.36.36#53(103.247.36.36) (TCP)
+;; WHEN: Thu Sep 24 18:07:57 UTC 2026
+;; MSG SIZE  rcvd: 48
+
+
+; <<>> DiG 9.20.24-1ubuntu0.3-Ubuntu <<>> @103.247.37.37 darkside.cloud +notcp +time=4 +tries=1
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 40698
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;darkside.cloud.			IN	A
+
+;; ANSWER SECTION:
+darkside.cloud.		30	IN	A	45.54.28.15
+
+;; Query time: 9 msec
+;; SERVER: 103.247.37.37#53(103.247.37.37) (UDP)
+;; WHEN: Thu Sep 24 18:07:57 UTC 2026
+;; MSG SIZE  rcvd: 48
+
+
+; <<>> DiG 9.20.24-1ubuntu0.3-Ubuntu <<>> @103.247.37.37 darkside.cloud +tcp +time=4 +tries=1
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 2679
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;darkside.cloud.			IN	A
+
+;; ANSWER SECTION:
+darkside.cloud.		30	IN	A	45.54.28.15
+
+;; Query time: 8 msec
+;; SERVER: 103.247.37.37#53(103.247.37.37) (TCP)
+;; WHEN: Thu Sep 24 18:07:57 UTC 2026
+;; MSG SIZE  rcvd: 48
+
+
+; <<>> DiG 9.20.24-1ubuntu0.3-Ubuntu <<>> @8.8.8.8 darkside.cloud +notcp +time=4 +tries=1
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 52995
+;; flags: qr rd ra ad; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+;; QUESTION SECTION:
+;darkside.cloud.			IN	A
+
+;; ANSWER SECTION:
+darkside.cloud.		14400	IN	A	198.49.23.145
+
+;; Query time: 55 msec
+;; SERVER: 8.8.8.8#53(8.8.8.8) (UDP)
+;; WHEN: Thu Sep 24 18:07:57 UTC 2026
+;; MSG SIZE  rcvd: 59
+
+
+; <<>> DiG 9.20.24-1ubuntu0.3-Ubuntu <<>> @8.8.8.8 darkside.cloud +tcp +time=4 +tries=1
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 2510
+;; flags: qr rd ra ad; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+;; QUESTION SECTION:
+;darkside.cloud.			IN	A
+
+;; ANSWER SECTION:
+darkside.cloud.		14400	IN	A	198.49.23.145
+
+;; Query time: 140 msec
+;; SERVER: 8.8.8.8#53(8.8.8.8) (TCP)
+;; WHEN: Thu Sep 24 18:07:57 UTC 2026
+;; MSG SIZE  rcvd: 59
+
+active

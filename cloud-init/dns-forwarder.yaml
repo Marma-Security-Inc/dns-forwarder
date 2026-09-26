@@ -1,0 +1,31 @@
+#cloud-config
+# Terraform template: base64 placeholders are rendered from repository files.
+# Bootstrap owns package update/install so it can back up before changing BIND.
+write_files:
+  - path: /opt/dns-forwarder/config/named.conf.options
+    owner: root:root
+    permissions: '0644'
+    encoding: b64
+    content: ${bind_config}
+  - path: /opt/dns-forwarder/scripts/bootstrap.sh
+    owner: root:root
+    permissions: '0755'
+    encoding: b64
+    content: ${bootstrap}
+  - path: /opt/dns-forwarder/scripts/health-check.sh
+    owner: root:root
+    permissions: '0755'
+    encoding: b64
+    content: ${health}
+  - path: /opt/dns-forwarder/scripts/diagnose.sh
+    owner: root:root
+    permissions: '0755'
+    encoding: b64
+    content: ${diagnose}
+  - path: /etc/dns-forwarder/settings.json
+    owner: root:root
+    permissions: '0600'
+    encoding: b64
+    content: ${settings}
+runcmd:
+  - [bash, /opt/dns-forwarder/scripts/bootstrap.sh]
