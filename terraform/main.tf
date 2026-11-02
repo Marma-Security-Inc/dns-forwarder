@@ -1,13 +1,16 @@
 provider "aws" {
-  region = var.aws_region
+  region  = var.aws_region
+  profile = "terraform-dev"
   default_tags {
     tags = merge({ Project = "dns-forwarder", ManagedBy = "Terraform" }, var.tags)
   }
 }
 data "aws_subnet" "selected" {
-  id = var.subnet_id
+  for_each = var.forwarders
+  id       = each.value.subnet_id
 }
 locals {
+  user_data_base64 = base64gzip(local.user_data)
   user_data = templatefile("${path.module}/../cloud-init/dns-forwarder.yaml", {
     bind_config = filebase64("${path.module}/../config/named.conf.options")
     helper      = filebase64("${path.module}/../scripts/forwarder_config.py")

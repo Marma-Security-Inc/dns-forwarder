@@ -13,8 +13,19 @@ variable "instance_type" {
 variable "vpc_id" {
   type = string
 }
-variable "subnet_id" {
-  type = string
+variable "forwarders" {
+  description = "Exactly two named forwarders, each in an existing public subnet in a different Availability Zone. Names are stable Terraform resource keys."
+  type = map(object({
+    subnet_id = string
+  }))
+  validation {
+    condition     = length(var.forwarders) == 2
+    error_message = "Configure exactly two DNS forwarders."
+  }
+  validation {
+    condition     = alltrue([for name, forwarder in var.forwarders : can(regex("^[a-z][a-z0-9-]*$", name)) && can(regex("^subnet-([0-9a-f]{8}|[0-9a-f]{17})$", forwarder.subnet_id))])
+    error_message = "Use lowercase forwarder names and valid subnet IDs; replace all placeholder subnet values."
+  }
 }
 variable "key_name" {
   type = string
@@ -35,10 +46,6 @@ variable "dns_client_cidrs" {
     condition     = length(var.dns_client_cidrs) > 0 && alltrue([for c in var.dns_client_cidrs : can(cidrnetmask(c))])
     error_message = "Supply a nonempty set of IPv4 client CIDRs."
   }
-}
-variable "associate_elastic_ip" {
-  type    = bool
-  default = false
 }
 variable "tags" {
   type    = map(string)

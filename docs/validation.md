@@ -1,5 +1,16 @@
 # Validation on the source server
 
+## Two-forwarder preparation (2026-11-02, local workstation)
+
+- PASS: Terraform initialization with the existing AWS provider lock file (`terraform init -backend=false -lockfile=readonly`).
+- PASS: Terraform formatting and configuration validation, using Terraform 1.16.5 and AWS provider 6.67.0.
+- PASS: five offline Terraform tests: two instances with matching EIP attachments/outputs, shared configuration and public UDP/TCP DNS; rejection of same-zone placement; rejection of a subnet in another VPC; rejection of a single forwarder; and rejection of placeholder subnet IDs.
+- PASS: after SSO renewal, AWS-backed plan saved and inspected: 9 creates, 0 changes, 0 deletions. Selected public subnets are in different zones with an Internet Gateway route; AMI architecture and key pair existence verified.
+- BLOCKED: two new EIPs require quota headroom; EC2 reports a limit of 10 and 10 allocations already exist. Service Quotas reads are denied for this profile; vCPU quota remains unverified.
+- NOT RUN: provisioning, cloud-init completion, instance health checks, or external DNS acceptance tests. No AWS resources or quotas were changed.
+
+Run `terraform -chdir=terraform test` with Terraform >= 1.7 for the mocked tests. All AWS operations in that test suite are mocked; a successful test does not establish AMI validity, subnet reachability, AWS quotas, or live service health. See [deployment status and prerequisites](two-forwarders.md).
+
 ## Original baseline (2026-09-24)
 
 Validated 2026-09-24 on Ubuntu 26.04 ARM64.
