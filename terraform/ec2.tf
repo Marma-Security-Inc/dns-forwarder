@@ -9,7 +9,7 @@ resource "aws_instance" "dns" {
   ami                         = var.ami_id
   instance_type               = var.instance_type
   subnet_id                   = each.value.subnet_id
-  key_name                    = var.key_name
+  key_name                    = var.ssh_public_key == null ? var.key_name : aws_key_pair.dns[0].key_name
   vpc_security_group_ids      = [aws_security_group.dns.id]
   associate_public_ip_address = true
   user_data_base64            = local.user_data_base64

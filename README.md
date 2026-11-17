@@ -10,8 +10,8 @@ Manual bootstrap no longer requires `ADMIN_CIDR`. Without an explicit or persist
 
 ## Prerequisites
 
-* Terraform >=1.5,<2 and AWS credentials with permission to create EC2, SG rules, tags and two Elastic IPs.
-* Existing VPC and two public subnets in different Availability Zones with Internet Gateway routes, suitable NACL, and an EC2 key pair in the chosen region.
+* Terraform >=1.5,<2 and AWS credentials with permission to create EC2, SG rules, tags, two Elastic IPs, and EC2 public-key import when used.
+* Existing VPC and two public subnets in different Availability Zones with Internet Gateway routes, suitable NACL, and an EC2 key pair in the chosen region (or its OpenSSH public key to import).
 * A pinned Canonical Ubuntu 26.04 ARM64 AMI for `t4g.small`, or an Ubuntu AMI and instance type with matching architecture. Obtain the current regional AMI from Canonical/AWS; verify its publisher. No AMI ID is invented here.
 * Terraform requires your trusted SSH source IPv4 CIDR. Replace the sample admin address. DNS defaults to all IPv4 clients; restricted DNS CIDRs are optional.
 * Ubuntu/Debian manual hosts need Bash, Python 3, systemd, OpenSSH, sudo/root, and apt repositories. Ubuntu cloud images include these.
@@ -28,9 +28,9 @@ vim terraform.tfvars  # Set both forwarders to verified public subnet IDs in dif
 terraform init
 terraform fmt -recursive
 terraform validate
-terraform plan -input=false -out=deploy.tfplan
-# Review: exactly two new EC2 instances and two new EIPs; no existing resources destroyed.
-terraform apply deploy.tfplan
+terraform plan -input=false -out=deploy-us-east-1.tfplan
+# Review: two new EC2 instances, two new EIPs, and an optional public-key import; no existing resources destroyed.
+terraform apply deploy-us-east-1.tfplan
 terraform output -json forwarders
 # Repeat the checks below for BOTH public_ip values in that output.
 PUBLIC_IP="REPLACE_WITH_ONE_FORWARDER_ELASTIC_IP"
@@ -44,11 +44,15 @@ dig @"$PUBLIC_IP" darkside.cloud +tcp
 
 ## Terraform and cloud-init
 
-Terraform creates exactly two EC2 instances in different Availability Zones, two associated EIPs, one shared SG, one SSH rule, two DNS rules per client CIDR, and one outbound IPv4 rule. It uses existing public subnets, a VPC, and a key pair. The required `forwarders` map names the pair and selects their subnets; Terraform rejects a VPC mismatch or shared Availability Zone. Public routing and NACL reachability must be verified separately. IMDSv2 is required and the root volume is encrypted. Public IPv4 is allocated initially even with EIP enabled so package installation can begin before association. Review AWS address charges.
+Terraform creates exactly two EC2 instances in different Availability Zones, two associated EIPs, one shared SG, one SSH rule, two DNS rules per client CIDR, and one outbound IPv4 rule. It uses existing public subnets and a VPC. By default it uses an existing regional key pair; supplying `ssh_public_key` creates that regional key pair by importing only its public key, and both instances wait for it. No private key is generated or stored by Terraform. The required `forwarders` map names the pair and selects their subnets; Terraform rejects a VPC mismatch or shared Availability Zone. Public routing and NACL reachability must be verified separately. IMDSv2 is required and the root volume is encrypted. Public IPv4 is allocated initially even with EIP enabled so package installation can begin before association. Review AWS address charges.
 
 `cloud-init/dns-forwarder.yaml` is a Terraform template, not standalone raw user-data. Terraform embeds repository files as base64, renders settings JSON, then gzip/base64 encodes the user-data. Cloud-init installs the files under `/opt/dns-forwarder` and runs bootstrap. Bootstrap updates apt, installs the seven required packages, backs up BIND, validates/restarts the detected service, preserves SSH, configures UFW, and checks health. It leaves `systemd-resolved` untouched. Logs: `/var/log/dns-forwarder-setup.log` and `/var/log/cloud-init-output.log`.
 
 Changing embedded files or client settings changes user-data and **replaces the instance** on the next apply. Review the plan for downtime/IP changes. Each EIP stays managed across instance replacement when its forwarder name remains unchanged. Renaming map keys changes resource addresses; review replacement and address-release effects before applying. SSH port 22 is the fresh-image Terraform assumption; manual bootstrap also detects configured/listening SSH ports.
+
+### Region and SSH key selection
+
+New preparation defaults to `us-east-1`. Use an AMI, VPC, and subnets from that region. EC2 key pairs are regional: set `key_name` to an existing pair, or set `key_name` plus `ssh_public_key` to import the matching OpenSSH public key during apply. Keep the existing private key for SSH. The destination key name must be unused when Terraform creates it. See [the current region plan and prerequisites](docs/two-forwarders.md).
 
 ### Existing single-server configurations
 

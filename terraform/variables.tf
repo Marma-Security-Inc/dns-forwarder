@@ -1,6 +1,6 @@
 variable "aws_region" {
   type    = string
-  default = "us-west-1"
+  default = "us-east-1"
 }
 variable "ami_id" {
   description = "Canonical Ubuntu 26.04 AMI in aws_region; match instance architecture. Pin a tested AMI."
@@ -28,7 +28,17 @@ variable "forwarders" {
   }
 }
 variable "key_name" {
-  type = string
+  description = "Existing regional EC2 key pair name, or the name to create when ssh_public_key is supplied."
+  type        = string
+}
+variable "ssh_public_key" {
+  description = "Optional OpenSSH public key to import as key_name in aws_region. Omit to use an existing regional key pair. Never supply a private key."
+  type        = string
+  default     = null
+  validation {
+    condition     = var.ssh_public_key == null ? true : can(regex("^ssh-(rsa|ed25519) [A-Za-z0-9+/=]+( |$)", trimspace(var.ssh_public_key)))
+    error_message = "Supply an OpenSSH RSA or ED25519 public key, or null to use an existing EC2 key pair."
+  }
 }
 variable "admin_cidr" {
   description = "Trusted SSH source IPv4 CIDR."

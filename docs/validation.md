@@ -1,5 +1,24 @@
 # Validation on the source server
 
+## us-east-1 live deployment (2026-11-02)
+
+- PASS: user-approved Terraform apply reported 10 resources created, 0 changed, 0 destroyed. Local state contains both new instances and their EIPs.
+- PASS: external UDP and TCP DNS queries to `54.80.104.29` and `184.192.128.142` returned `NOERROR` and an A answer for `darkside.cloud`.
+- PASS (startup evidence): EC2 console logs on both instances contain a successful DNS forwarder host health result and cloud-init completion. Completion times: 11:28:06 UTC (dns-1), 11:28:09 UTC (dns-2), 2026-11-02. No separate SSH health rerun is claimed.
+- Both instances are running. Last inspected EC2 system checks were OK on both, with the instance check OK on dns-2 and still initializing on dns-1.
+- SSH limitation: the matching key was located, but TCP/22 times out from the workstation. Observed public source `120.138.12.74` differs from security group's permitted `202.141.35.119/32`. The configured host firewall uses the same admin CIDR. No firewall changes were made.
+
+
+## us-east-1 preparation and SSH public-key import (2026-11-02)
+
+- PASS: `terraform validate` and formatting checks.
+- PASS: 7 mocked Terraform tests, adding coverage for a single public-key import shared by both forwarders, reuse of existing key pairs when import is omitted, and rejection of private-key input. Existing topology, EIP, and DNS checks remain covered.
+- PASS: AWS-backed plan saved as ignored `terraform/deploy-us-east-1.tfplan`; programmatic inspection confirms the selected region, AMI, subnet IDs, shared imported key, 10 creates, 0 changes, and 0 deletions.
+- PASS: `ImportKeyPair --dry-run` confirmed import permission without creating the key pair. Only public key material was read; no private key was accessed.
+- PASS: EIP headroom observed at 2 allocated against a limit of 5. Selected subnets have different zones, Internet Gateway routing, and permissive IPv4 NACLs; ARM64 AMI ownership and regional t4g.small offerings verified.
+- UNVERIFIED: Standard On-Demand vCPU quota, instance capacity at apply time, local possession of the private key, and current SSH source reachability.
+- NOT RUN: Terraform apply or live acceptance checks. No AWS resources were created or modified.
+
 ## Two-forwarder preparation (2026-11-02, local workstation)
 
 - PASS: Terraform initialization with the existing AWS provider lock file (`terraform init -backend=false -lockfile=readonly`).
